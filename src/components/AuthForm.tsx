@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useSession } from '@/store/useSession';
@@ -29,7 +29,7 @@ export function AuthForm() {
   const [showToken, setShowToken] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<AuthFormData>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<AuthFormData>({
     resolver: zodResolver(authSchema),
     defaultValues: {
       platform: 8,
@@ -44,13 +44,17 @@ export function AuthForm() {
     try {
       const response = await postFormUrlEncoded('/v1/auth', data);
       
-      const { authToken, refreshToken: refresh, expiresIn, refreshExpiresIn } = response.data;
+      const { authToken } = response.data;
+      
+      // Convert ISO dates to seconds from now
+      const expiresInSeconds = Math.floor((new Date(authToken.expiresIn).getTime() - Date.now()) / 1000);
+      const refreshExpiresInSeconds = Math.floor((new Date(authToken.refreshExpiresIn).getTime() - Date.now()) / 1000);
       
       setToken({
         token: authToken.token,
-        refreshToken: refresh.token,
-        expiresIn: expiresIn,
-        refreshExpiresIn: refreshExpiresIn,
+        refreshToken: authToken.refreshToken,
+        expiresIn: expiresInSeconds,
+        refreshExpiresIn: refreshExpiresInSeconds,
       });
 
       toast.success('Autenticação realizada com sucesso!');
@@ -74,13 +78,17 @@ export function AuthForm() {
         refreshToken: refreshToken,
       });
 
-      const { authToken, refreshToken: newRefresh, expiresIn, refreshExpiresIn } = response.data;
+      const { authToken } = response.data;
+      
+      // Convert ISO dates to seconds from now
+      const expiresInSeconds = Math.floor((new Date(authToken.expiresIn).getTime() - Date.now()) / 1000);
+      const refreshExpiresInSeconds = Math.floor((new Date(authToken.refreshExpiresIn).getTime() - Date.now()) / 1000);
 
       setToken({
         token: authToken.token,
-        refreshToken: newRefresh.token,
-        expiresIn: expiresIn,
-        refreshExpiresIn: refreshExpiresIn,
+        refreshToken: authToken.refreshToken,
+        expiresIn: expiresInSeconds,
+        refreshExpiresIn: refreshExpiresInSeconds,
       });
 
       toast.success('Token atualizado com sucesso!');
@@ -175,17 +183,47 @@ export function AuthForm() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label htmlFor="authtoken">Auth Token</Label>
-                <Switch id="authtoken" {...register('authtoken')} defaultChecked />
+                <Controller
+                  name="authtoken"
+                  control={control}
+                  render={({ field }) => (
+                    <Switch
+                      id="authtoken"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  )}
+                />
               </div>
 
               <div className="flex items-center justify-between">
                 <Label htmlFor="stayConnected">Stay Connected</Label>
-                <Switch id="stayConnected" {...register('stayConnected')} defaultChecked />
+                <Controller
+                  name="stayConnected"
+                  control={control}
+                  render={({ field }) => (
+                    <Switch
+                      id="stayConnected"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  )}
+                />
               </div>
 
               <div className="flex items-center justify-between">
                 <Label htmlFor="expireCurrentSession">Expire Current Session</Label>
-                <Switch id="expireCurrentSession" {...register('expireCurrentSession')} />
+                <Controller
+                  name="expireCurrentSession"
+                  control={control}
+                  render={({ field }) => (
+                    <Switch
+                      id="expireCurrentSession"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  )}
+                />
               </div>
             </div>
 
