@@ -1,73 +1,190 @@
-# Welcome to your Lovable project
+# Leankeep API Tester
 
-## Project info
+⚠️ **DEV ONLY – NÃO PUBLICAR EM PRODUÇÃO** ⚠️
 
-**URL**: https://lovable.dev/projects/5909ca22-81c8-4df5-8c7a-f61e4b3e8f56
+Esta é uma ferramenta de desenvolvimento para testar a Leankeep API. **NUNCA** publique este projeto em produção ou compartilhe com usuários finais.
 
-## How can I edit this code?
+## ⚠️ Avisos de Segurança
 
-There are several ways of editing your application.
+- **NÃO hardcode** credenciais, tokens ou IDs sensíveis no código
+- **NÃO publique** este projeto em produção
+- **NÃO compartilhe** tokens ou credenciais via screenshots ou logs
+- **NÃO use** dados reais de clientes sem autorização
+- **SEMPRE** limpe a sessão após o uso
+- **NUNCA** use localStorage - apenas sessionStorage
 
-**Use Lovable**
+## Recursos de Segurança
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5909ca22-81c8-4df5-8c7a-f61e4b3e8f56) and start prompting.
+- ✅ Banner de aviso DEV ONLY permanente
+- ✅ Tokens armazenados apenas em memória e sessionStorage
+- ✅ Redação automática de dados sensíveis nas respostas
+- ✅ Logger que remove headers sensíveis
+- ✅ Inputs de senha sem autocomplete
+- ✅ Opção de mostrar/ocultar tokens truncados
+- ✅ cURL gerado com redação de Authorization por padrão
+- ✅ Auto-logout quando token expira
+- ✅ Validação forte de formulários com zod
 
-Changes made via Lovable will be committed automatically to this repo.
+## Tech Stack
 
-**Use your preferred IDE**
+- React 18 + TypeScript + Vite
+- Axios (HTTP client)
+- Zustand (state management)
+- React Hook Form + Zod (forms & validation)
+- TanStack Query (data fetching)
+- Tailwind CSS + shadcn/ui
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Como Usar
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 1. Instalação
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### 2. Configurar Ambiente
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Na seção "Configuração de Ambiente", configure:
+- **Auth Host**: URL do servidor de autenticação (default: https://auth.lkp.app.br)
+- **API Host**: URL do servidor da API (default: https://api.lkp.app.br)
+- **Empresa ID, Unidade ID, Site ID**: IDs necessários para as requisições
+- **X-Transaction-Id**: ID de transação (UUID)
+- **Modo de Redação**: ON para ocultar dados sensíveis (recomendado)
 
-**Use GitHub Codespaces**
+### 3. Autenticar
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Na seção "Autenticação":
+1. Insira suas credenciais
+2. Configure Platform ID (default: 8)
+3. Ajuste as opções de autenticação
+4. Clique em "Autenticar"
 
-## What technologies are used for this project?
+O token será armazenado em memória e sessionStorage. Use "Refresh Token" para renovar ou "Logout" para limpar a sessão.
 
-This project is built with:
+### 4. Testar Endpoints
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Use as abas para testar diferentes endpoints:
 
-## How can I deploy this project?
+#### Ocorrências
+- **GET**: Listar ocorrências (paginado)
+- **POST**: Criar nova ocorrência
 
-Simply open [Lovable](https://lovable.dev/projects/5909ca22-81c8-4df5-8c7a-f61e4b3e8f56) and click on Share -> Publish.
+#### Correções
+- **GET**: Listar correções de uma ocorrência
+- **ToEdit**: Obter correção para edição
+- **Tipos**: Listar tipos de correção
+- **POST**: Criar nova correção
 
-## Can I connect a custom domain to my Lovable project?
+#### Atividades
+- **Listagem**: Listar atividades
+- **Plano**: Listar atividades do plano
+- **Aplicação**: Listar atividades de aplicação
 
-Yes, you can!
+#### Baixa
+- **List**: Listar atividades para baixa
+- **Medições**: Obter medições de uma tarefa
+- **Justificativas**: Listar justificativas
+- **Baixa**: Realizar baixa de atividades (PUT)
+- **Post Medições**: Enviar medições
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### 5. Visualizar Resultados
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Cada requisição mostra:
+- **Request**: Método, URL, headers (redigidos), query params e body
+- **Response**: Status HTTP e dados JSON (com redação de campos sensíveis)
+- **Botão "Copiar cURL"**: Gera comando cURL com Authorization redigido por padrão
+
+## Modo de Redação
+
+Quando **Redact Mode** está ON (padrão):
+- Tokens aparecem truncados: `eyJhbG...abcd`
+- E-mails são mascarados: `a***@domain.com`
+- Campos sensíveis são ocultados: `***`
+- cURL gerado redige o header Authorization
+
+Para debug avançado, desative o modo de redação, mas **NUNCA** compartilhe screenshots ou logs com dados reais.
+
+## Estrutura do Projeto
+
+```
+src/
+├── components/
+│   ├── tabs/           # Componentes de cada aba
+│   ├── AuthForm.tsx    # Formulário de autenticação
+│   ├── DevBanner.tsx   # Banner de aviso
+│   ├── EnvForm.tsx     # Configuração de ambiente
+│   ├── JsonViewer.tsx  # Visualizador JSON com redação
+│   ├── RequestPanel.tsx # Painel de requisição
+│   ├── ResponsePanel.tsx # Painel de resposta
+│   └── Runner.tsx      # Container das abas
+├── lib/
+│   ├── api.ts         # Configuração Axios e helpers
+│   ├── logger.ts      # Logger seguro
+│   └── redact.ts      # Funções de redação
+├── store/
+│   └── useSession.ts  # Zustand store
+└── pages/
+    └── Index.tsx      # Página principal
+```
+
+## Endpoints Disponíveis
+
+### Auth API (auth.lkp.app.br)
+- `POST /v1/auth` - Autenticação (form-urlencoded)
+- `POST /v1/refresh` - Refresh token (JSON)
+
+### Main API (api.lkp.app.br)
+
+**Ocorrências:**
+- `GET /v1/ocorrencias` - Listar (requer EmpresaId, PageIndex, PageSize)
+- `POST /v1/ocorrencias` - Criar (requer EmpresaId, UnidadeId + body)
+
+**Correções:**
+- `GET /v1/correcoes` - Listar (requer ocorrenciaId, EmpresaId)
+- `GET /v1/correcoes/{id}/toedit` - Para edição (requer EmpresaId)
+- `GET /v1/correcoes/tipos` - Tipos (requer EmpresaId)
+- `POST /v1/correcoes` - Criar (body com ocorrenciaId, descrição, etc)
+
+**Atividades:**
+- `GET /v1/atividades` - Listar (requer EmpresaId, X-Transaction-Id, StatusId, SelectedDate)
+- `GET /v1/atividades/plano` - Plano (mesmos headers/params)
+- `GET /v1/atividades/aplicacao` - Aplicação (mesmos + SiteId opcional)
+
+**Baixa:**
+- `GET /v1/atividades/baixa/list` - Listar (query: ids[])
+- `GET /v1/atividades/{tarefa}/medicoes` - Medições
+- `GET /v1/atividades/justificativas` - Justificativas (requer EmpresaId)
+- `PUT /v1/atividades/baixa` - Realizar baixa
+- `POST /v1/atividades/medicoes` - Enviar medições
+
+## Troubleshooting
+
+### Token expirado
+O sistema detecta automaticamente quando o token expira e faz logout. Use "Refresh Token" antes de expirar.
+
+### Erro 401 Unauthorized
+Verifique se:
+1. Você está autenticado
+2. O token não expirou
+3. As credenciais estão corretas
+
+### Erro 400 Bad Request
+Verifique se:
+1. Todos os campos obrigatórios estão preenchidos
+2. Os IDs de configuração estão corretos
+3. O formato dos dados está correto (ex: data em YYYY-MM-DD)
+
+### Erro de CORS
+Este projeto deve ser usado apenas em desenvolvimento local.
+
+## Limpeza de Dados
+
+Ao terminar de usar:
+1. Clique em "Logout" para limpar tokens
+2. Feche o navegador para limpar sessionStorage
+3. Não deixe a aplicação aberta sem supervisão
+
+## Licença e Uso
+
+Esta ferramenta é de uso interno e desenvolvimento apenas. Não redistribuir.
